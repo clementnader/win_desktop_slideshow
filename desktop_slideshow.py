@@ -10,16 +10,24 @@ import subprocess
 import PIL.Image
 import infi.systray
 
-BACKGROUNDS_DIRECTORY = os.path.join(os.environ.get("UserProfile"), r"Pictures\Backgrounds")
-THEMES_DIRECTORY = os.path.join(os.environ.get("AppData"), r"Microsoft\Windows\Themes")
-DEST_FILE_NAME = r"TranscodedWallpaper"
 
+# Location of the directory containing the wallpapers to display
+BACKGROUNDS_DIRECTORY = os.path.join(os.environ.get("UserProfile"), r"Pictures\Backgrounds")
+
+# Delay between each new wallpaper
 DELAY_BETWEEN_UPDATES = 180  # update every 3 mn
+
+# Location of the Windows directory where the current wallpaper is stored
+THEMES_DIRECTORY = os.path.join(os.environ.get("AppData"), r"Microsoft\Windows\Themes")
+# Name of the file where the current wallpaper is stored
+DESTINATION_FILE_NAME = r"TranscodedWallpaper"
+
+# List of the image extensions that will be copied for the wallpaper
 IMAGE_EXTENSIONS = [".png", ".jpg", ".jpeg"]
 
 
-class MySysTrayIcon(infi.systray.SysTrayIcon):  # update the SysTrayIcon class to be able to change
-    # the menu options buttons after the start.
+class MySysTrayIcon(infi.systray.SysTrayIcon):
+    # Update the SysTrayIcon class to be able to change the menu options buttons after the start.
     def __init__(self,
                  icon,
                  hover_text,
@@ -97,9 +105,9 @@ def change_background(systray: MySysTrayIcon, previous: bool = False):
             next_option, _ = get_menu_options()
             systray.update_menu_options(next_option)
 
-    shutil.copyfile(os.path.join(BACKGROUNDS_DIRECTORY, image_file), os.path.join(THEMES_DIRECTORY, DEST_FILE_NAME))
-    with open(os.path.join(THEMES_DIRECTORY, DEST_FILE_NAME + "_img.txt"), "w") as f:
-        f.write(image_file)  # we store the name of the image in a text file
+    shutil.copyfile(os.path.join(BACKGROUNDS_DIRECTORY, image_file), os.path.join(THEMES_DIRECTORY, DESTINATION_FILE_NAME))
+    with open(os.path.join(THEMES_DIRECTORY, DESTINATION_FILE_NAME + "_img.txt"), "w") as f:
+        f.write(image_file)  # we store the name of the current image in a text file
 
 
 def update_screen():
@@ -126,6 +134,7 @@ def get_menu_options():
 
 
 def tray_icon() -> MySysTrayIcon:
+    # Icon in the task bar
     def stop(_):
         global TOOL_RUNNING
         TOOL_RUNNING = False
@@ -145,7 +154,7 @@ def main():
     # test_correct_images()
 
     systray = tray_icon()  # activate the tray icon
-    # it enables to be able to quit the program, and also it allows to skip immediately to another wallpaper
+    # it permits to be able to quit the program, and also it allows to skip immediately to another wallpaper
 
     next_exec_time = 0
     while TOOL_RUNNING:
